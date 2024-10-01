@@ -284,8 +284,8 @@ export function InvestmentCalculatorComponent() {
             <p className="text-blue-800">{result}</p>
           </div>
         )}
-        <div className="mt-8 min-h-[400px]">
-          {savingsChartData.length > 0 ? (
+        <div className="mt-8">
+          {savingsChartData.length > 0 && (
             <>
               <h3 className="text-lg font-semibold mb-4 text-blue-700">
                 Savings Period
@@ -317,16 +317,10 @@ export function InvestmentCalculatorComponent() {
                 </BarChart>
               </ResponsiveContainer>
             </>
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">
-                Calculate to see the Savings Period chart
-              </p>
-            </div>
           )}
         </div>
-        <div className="mt-8 min-h-[400px]">
-          {netWorthChartData.length > 0 ? (
+        <div className="mt-8">
+          {netWorthChartData.length > 0 && (
             <>
               <h3 className="text-lg font-semibold mb-4 text-blue-700">
                 Net Worth Projection (40 Years)
@@ -341,12 +335,6 @@ export function InvestmentCalculatorComponent() {
                 </BarChart>
               </ResponsiveContainer>
             </>
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">
-                Calculate to see the Net Worth Projection chart
-              </p>
-            </div>
           )}
         </div>
       </CardContent>
