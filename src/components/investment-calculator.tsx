@@ -23,9 +23,9 @@ import {
 } from "recharts";
 
 export function InvestmentCalculatorComponent() {
-  const [income, setIncome] = useState("");
-  const [expenses, setExpenses] = useState("");
-  const [savings, setSavings] = useState("");
+  const [income, setIncome] = useState("37500");
+  const [expenses, setExpenses] = useState("10000");
+  const [savings, setSavings] = useState("100000");
   const [livingOffRate, setLivingOffRate] = useState("4");
   const [interestRate, setInterestRate] = useState("8");
   const [taxRate, setTaxRate] = useState("28");
@@ -33,7 +33,7 @@ export function InvestmentCalculatorComponent() {
   const [savingsChartData, setSavingsChartData] = useState<any[]>([]);
   const [netWorthChartData, setNetWorthChartData] = useState<any[]>([]);
   const [yearsNeeded, setYearsNeeded] = useState(0);
-  const [sliderValue, setSliderValue] = useState(40);
+  const [sliderValue, setSliderValue] = useState(0); // Keep this static for the last chart
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -89,7 +89,10 @@ export function InvestmentCalculatorComponent() {
         year: years,
         netWorth: totalSavings,
       });
+      console.log(totalSavings);
     }
+    setYearsNeeded(years); // Set yearsNeeded based on the calculated years
+    setSliderValue(years); // Update sliderValue to reflect the calculated years
 
     // Living off investments phase
     for (let i = years; i < 40; i++) {
@@ -106,8 +109,6 @@ export function InvestmentCalculatorComponent() {
       });
     }
 
-    setYearsNeeded(years);
-    setSliderValue(years);
     setSavingsChartData(newSavingsChartData);
     setNetWorthChartData(newNetWorthChartData);
     setResult(
@@ -117,11 +118,62 @@ export function InvestmentCalculatorComponent() {
     );
   };
 
+  const handleYearsChange = (newYears: number) => {
+    setYearsNeeded(newYears);
+    calculateChartData(newYears); // Recalculate chart data based on new yearsNeeded
+  };
+
+  const calculateChartData = (years: number) => {
+    const incomeNum = parseFloat(income.replace(/,/g, ""));
+    const expensesNum = parseFloat(expenses.replace(/,/g, ""));
+    const savingsNum = parseFloat(savings.replace(/,/g, ""));
+    const livingOffRateNum = parseFloat(livingOffRate) / 100;
+    const interestRateNum = parseFloat(interestRate) / 100;
+    const taxRateNum = parseFloat(taxRate) / 100;
+
+    const newSavingsChartData = [];
+    const newNetWorthChartData = [];
+    let totalSavings = savingsNum;
+    const annualContributions = incomeNum - expensesNum;
+
+    // Accumulation phase
+    for (let year = 0; year < years; year++) {
+      const interestEarned = totalSavings * interestRateNum;
+      totalSavings += annualContributions + interestEarned;
+      newSavingsChartData.push({
+        year: year + 1,
+        contributions: annualContributions,
+        returns: interestEarned,
+      });
+      newNetWorthChartData.push({
+        year: year + 1,
+        netWorth: totalSavings,
+      });
+    }
+
+    // Living off investments phase
+    for (let year = years; year < 40; year++) {
+      const grossReturns = totalSavings * interestRateNum;
+      const livingExpenses = expensesNum;
+      const taxableAmount = Math.min(grossReturns, livingExpenses);
+      const taxPaid = taxableAmount * taxRateNum;
+      const netReturns = grossReturns - taxPaid;
+      totalSavings = totalSavings + netReturns - livingExpenses;
+      newNetWorthChartData.push({
+        year: year + 1,
+        netWorth: totalSavings,
+      });
+    }
+
+    setSavingsChartData(newSavingsChartData);
+    setNetWorthChartData(newNetWorthChartData);
+  };
+
   useEffect(() => {
     if (savingsChartData.length > 0) {
-      setSavingsChartData(savingsChartData.slice(0, sliderValue));
+      setSavingsChartData(savingsChartData.slice(0, yearsNeeded));
     }
-  }, [sliderValue]);
+  }, [yearsNeeded]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -239,14 +291,14 @@ export function InvestmentCalculatorComponent() {
                 Savings Period
               </h3>
               <div className="mb-4">
-                <Label htmlFor="yearsSlider">Adjust Years: {sliderValue}</Label>
+                <Label htmlFor="yearsSlider">Adjust Years: {yearsNeeded}</Label>
                 <Slider
                   id="yearsSlider"
-                  min={yearsNeeded}
+                  min={1}
                   max={40}
                   step={1}
-                  value={[sliderValue]}
-                  onValueChange={(value) => setSliderValue(value[0])}
+                  value={[yearsNeeded]} // Ensure this is an array
+                  onValueChange={(value) => handleYearsChange(value[0])} // Update state correctly
                   className="text-blue-600"
                 />
               </div>
