@@ -33,7 +33,6 @@ export function InvestmentCalculatorComponent() {
   const [savingsChartData, setSavingsChartData] = useState<any[]>([]);
   const [netWorthChartData, setNetWorthChartData] = useState<any[]>([]);
   const [yearsNeeded, setYearsNeeded] = useState(0);
-  const [sliderValue, setSliderValue] = useState(0); // Keep this static for the last chart
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -92,7 +91,6 @@ export function InvestmentCalculatorComponent() {
       console.log(totalSavings);
     }
     setYearsNeeded(years); // Set yearsNeeded based on the calculated years
-    setSliderValue(years); // Update sliderValue to reflect the calculated years
 
     // Living off investments phase
     for (let i = years; i < 40; i++) {
