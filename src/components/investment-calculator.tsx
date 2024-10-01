@@ -193,7 +193,7 @@ export function InvestmentCalculatorComponent() {
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-blue-700">
-          Investment Calculator
+          Pension Tension
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
