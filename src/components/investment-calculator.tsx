@@ -232,7 +232,7 @@ export function InvestmentCalculatorComponent() {
             Advanced Options
             <ChevronDownIcon className="w-4 h-4" />
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-2 mt-2">
+          <CollapsibleContent className="space-y-2 mt-2 p-4 border border-blue-200 bg-blue-50 rounded-lg">
             <div className="space-y-2">
               <Label htmlFor="livingOffRate">Max Living Off Rate (%)</Label>
               <Input
