@@ -29,10 +29,11 @@ export function InvestmentCalculatorComponent() {
   const [livingOffRate, setLivingOffRate] = useState("4");
   const [interestRate, setInterestRate] = useState("8");
   const [taxRate, setTaxRate] = useState("28");
-  const [result, setResult] = useState<string | null>(null);
   const [savingsChartData, setSavingsChartData] = useState<any[]>([]);
   const [netWorthChartData, setNetWorthChartData] = useState<any[]>([]);
   const [yearsNeeded, setYearsNeeded] = useState(0);
+  const [amountNeeded, setAmountNeeded] = useState(0);
+  const [actualYears, setActualYears] = useState(0);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -91,6 +92,7 @@ export function InvestmentCalculatorComponent() {
       console.log(totalSavings);
     }
     setYearsNeeded(years); // Set yearsNeeded based on the calculated years
+    setActualYears(years); // Set actualYears for later use
 
     // Living off investments phase
     for (let i = years; i < 40; i++) {
@@ -109,15 +111,16 @@ export function InvestmentCalculatorComponent() {
 
     setSavingsChartData(newSavingsChartData);
     setNetWorthChartData(newNetWorthChartData);
-    setResult(
-      `You need approximately ${formatCurrency(
-        neededAmount
-      )} to start living off your investments. You need to save for approximately ${years} year(s).`
-    );
+    setAmountNeeded(neededAmount);
+    // setResult(
+    //   `You need approximately <strong>${formatCurrency(
+    //     neededAmount
+    //   )}</strong> to start living off your investments. You need to save for approximately <strong>${years}</strong> year(s).`
+    // );
   };
 
   const handleYearsChange = (newYears: number) => {
-    setYearsNeeded(newYears);
+    setActualYears(newYears);
     calculateChartData(newYears); // Recalculate chart data based on new yearsNeeded
   };
 
@@ -169,9 +172,9 @@ export function InvestmentCalculatorComponent() {
 
   useEffect(() => {
     if (savingsChartData.length > 0) {
-      setSavingsChartData(savingsChartData.slice(0, yearsNeeded));
+      setSavingsChartData(savingsChartData.slice(0, actualYears));
     }
-  }, [yearsNeeded]);
+  }, [actualYears]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -277,9 +280,15 @@ export function InvestmentCalculatorComponent() {
         >
           Calculate Needed Amount
         </Button>
-        {result && (
+        {!!yearsNeeded && (
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-blue-800">{result}</p>
+            <p className="text-blue-800">
+              {`You need approximately `}
+              <strong>{formatCurrency(amountNeeded)}</strong>
+              {` to start living off your investments. You need to save for approximately `}
+              <strong>{yearsNeeded}</strong>
+              {` year(s).`}
+            </p>
           </div>
         )}
         <div className="mt-8">
@@ -289,13 +298,13 @@ export function InvestmentCalculatorComponent() {
                 Savings Period
               </h3>
               <div className="mb-4">
-                <Label htmlFor="yearsSlider">Adjust Years: {yearsNeeded}</Label>
+                <Label htmlFor="yearsSlider">Adjust Years: {actualYears}</Label>
                 <Slider
                   id="yearsSlider"
                   min={1}
                   max={40}
                   step={1}
-                  value={[yearsNeeded]} // Ensure this is an array
+                  value={[actualYears]} // Ensure this is an array
                   onValueChange={(value) => handleYearsChange(value[0])} // Update state correctly
                   className="text-blue-600 mt-2"
                 />
