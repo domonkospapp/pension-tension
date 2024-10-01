@@ -297,7 +297,7 @@ export function InvestmentCalculatorComponent() {
                   step={1}
                   value={[yearsNeeded]} // Ensure this is an array
                   onValueChange={(value) => handleYearsChange(value[0])} // Update state correctly
-                  className="text-blue-600"
+                  className="text-blue-600 mt-2"
                 />
               </div>
               <ResponsiveContainer width="100%" height={300}>
