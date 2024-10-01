@@ -23,9 +23,9 @@ import {
 } from "recharts";
 
 export function InvestmentCalculatorComponent() {
-  const [income, setIncome] = useState("37500");
-  const [expenses, setExpenses] = useState("10000");
-  const [savings, setSavings] = useState("100000");
+  const [income, setIncome] = useState("0");
+  const [expenses, setExpenses] = useState("0");
+  const [savings, setSavings] = useState("0");
   const [livingOffRate, setLivingOffRate] = useState("4");
   const [interestRate, setInterestRate] = useState("8");
   const [taxRate, setTaxRate] = useState("28");
