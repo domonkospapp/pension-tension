@@ -307,7 +307,10 @@ export function InvestmentCalculatorComponent() {
                 <BarChart data={savingsChartData}>
                   <XAxis dataKey="year" />
                   <YAxis tickFormatter={formatMillions} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip
+                    cursor={{ fill: "rgba(191, 219, 254, 0.3)" }}
+                    content={<CustomTooltip />}
+                  />
                   <Legend />
                   <Bar
                     dataKey="contributions"
@@ -330,7 +333,10 @@ export function InvestmentCalculatorComponent() {
                 <BarChart data={netWorthChartData}>
                   <XAxis dataKey="year" />
                   <YAxis tickFormatter={formatMillions} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip
+                    cursor={{ fill: "rgba(191, 219, 254, 0.3)" }}
+                    content={<CustomTooltip />}
+                  />
                   <Legend />
                   <Bar dataKey="netWorth" fill="#2563eb" name="Net Worth" />
                 </BarChart>
