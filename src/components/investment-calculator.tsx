@@ -272,7 +272,7 @@ export function InvestmentCalculatorComponent() {
           onClick={calculateNeededAmount}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white"
         >
-          Calculate Needed Amount
+          Calculate Needed Years
         </Button>
         {!!yearsNeeded && (
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
