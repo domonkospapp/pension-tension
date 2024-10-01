@@ -1,106 +1,127 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Slider } from "@/components/ui/slider"
-import { ChevronDownIcon } from 'lucide-react'
-import { Bar, BarChart, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Slider } from "@/components/ui/slider";
+import { ChevronDownIcon } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 export function InvestmentCalculatorComponent() {
-  const [income, setIncome] = useState('')
-  const [expenses, setExpenses] = useState('')
-  const [savings, setSavings] = useState('')
-  const [livingOffRate, setLivingOffRate] = useState('4')
-  const [interestRate, setInterestRate] = useState('8')
-  const [taxRate, setTaxRate] = useState('28')
-  const [result, setResult] = useState<string | null>(null)
-  const [savingsChartData, setSavingsChartData] = useState<any[]>([])
-  const [netWorthChartData, setNetWorthChartData] = useState<any[]>([])
-  const [yearsNeeded, setYearsNeeded] = useState(0)
-  const [sliderValue, setSliderValue] = useState(40)
+  const [income, setIncome] = useState("");
+  const [expenses, setExpenses] = useState("");
+  const [savings, setSavings] = useState("");
+  const [livingOffRate, setLivingOffRate] = useState("4");
+  const [interestRate, setInterestRate] = useState("8");
+  const [taxRate, setTaxRate] = useState("28");
+  const [result, setResult] = useState<string | null>(null);
+  const [savingsChartData, setSavingsChartData] = useState<any[]>([]);
+  const [netWorthChartData, setNetWorthChartData] = useState<any[]>([]);
+  const [yearsNeeded, setYearsNeeded] = useState(0);
+  const [sliderValue, setSliderValue] = useState(40);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value)
-  }
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
   const formatMillions = (value: number) => {
-    return `${(value / 1000000).toFixed(1)}M`
-  }
+    return `${(value / 1000000).toFixed(1)}M`;
+  };
 
   const formatInputValue = (value: string) => {
-    const number = parseFloat(value.replace(/[^\d.-]/g, ''))
-    if (isNaN(number)) return ''
-    return number.toLocaleString('en-US')
-  }
+    const number = parseFloat(value.replace(/[^\d.-]/g, ""));
+    if (isNaN(number)) return "";
+    return number.toLocaleString("en-US");
+  };
 
   const calculateNeededAmount = () => {
-    const incomeNum = parseFloat(income.replace(/,/g, ''))
-    const expensesNum = parseFloat(expenses.replace(/,/g, ''))
-    const savingsNum = parseFloat(savings.replace(/,/g, ''))
-    const livingOffRateNum = parseFloat(livingOffRate) / 100
-    const interestRateNum = parseFloat(interestRate) / 100
-    const taxRateNum = parseFloat(taxRate) / 100
+    const incomeNum = parseFloat(income.replace(/,/g, ""));
+    const expensesNum = parseFloat(expenses.replace(/,/g, ""));
+    const savingsNum = parseFloat(savings.replace(/,/g, ""));
+    const livingOffRateNum = parseFloat(livingOffRate) / 100;
+    const interestRateNum = parseFloat(interestRate) / 100;
+    const taxRateNum = parseFloat(taxRate) / 100;
 
     if (expensesNum <= 0 || savingsNum < 0 || incomeNum <= 0) {
-      alert("Please enter valid income, expenses, and savings.")
-      return
+      alert("Please enter valid income, expenses, and savings.");
+      return;
     }
 
-    const neededAmount = expensesNum / livingOffRateNum
-    let years = 0
-    let totalSavings = savingsNum
-    const annualContributions = incomeNum - expensesNum
+    const neededAmount = expensesNum / livingOffRateNum;
+    let years = 0;
+    let totalSavings = savingsNum;
+    const annualContributions = incomeNum - expensesNum;
 
-    const newSavingsChartData = []
-    const newNetWorthChartData = []
+    const newSavingsChartData = [];
+    const newNetWorthChartData = [];
 
     // Accumulation phase
     while (totalSavings < neededAmount && years < 40) {
-      const interestEarned = totalSavings * interestRateNum
-      totalSavings += annualContributions + interestEarned
-      years++
+      const interestEarned = totalSavings * interestRateNum;
+      totalSavings += annualContributions + interestEarned;
+      years++;
       newSavingsChartData.push({
         year: years,
         contributions: annualContributions,
         returns: interestEarned,
-      })
+      });
       newNetWorthChartData.push({
         year: years,
         netWorth: totalSavings,
-      })
+      });
     }
 
     // Living off investments phase
     for (let i = years; i < 40; i++) {
-      const grossReturns = totalSavings * interestRateNum
-      const livingExpenses = expensesNum
-      const taxableAmount = Math.min(grossReturns, livingExpenses)
-      const taxPaid = taxableAmount * taxRateNum
-      const netReturns = grossReturns - taxPaid
-      totalSavings = totalSavings + netReturns - livingExpenses
-      years++
+      const grossReturns = totalSavings * interestRateNum;
+      const livingExpenses = expensesNum;
+      const taxableAmount = Math.min(grossReturns, livingExpenses);
+      const taxPaid = taxableAmount * taxRateNum;
+      const netReturns = grossReturns - taxPaid;
+      totalSavings = totalSavings + netReturns - livingExpenses;
+      years++;
       newNetWorthChartData.push({
         year: years,
         netWorth: totalSavings,
-      })
+      });
     }
 
-    setYearsNeeded(years)
-    setSliderValue(years)
-    setSavingsChartData(newSavingsChartData)
-    setNetWorthChartData(newNetWorthChartData)
-    setResult(`You need approximately ${formatCurrency(neededAmount)} to start living off your investments. You need to save for approximately ${years} year(s).`)
-  }
+    setYearsNeeded(years);
+    setSliderValue(years);
+    setSavingsChartData(newSavingsChartData);
+    setNetWorthChartData(newNetWorthChartData);
+    setResult(
+      `You need approximately ${formatCurrency(
+        neededAmount
+      )} to start living off your investments. You need to save for approximately ${years} year(s).`
+    );
+  };
 
   useEffect(() => {
     if (savingsChartData.length > 0) {
-      setSavingsChartData(savingsChartData.slice(0, sliderValue))
+      setSavingsChartData(savingsChartData.slice(0, sliderValue));
     }
-  }, [sliderValue])
+  }, [sliderValue]);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -113,15 +134,17 @@ export function InvestmentCalculatorComponent() {
             </p>
           ))}
         </div>
-      )
+      );
     }
-    return null
-  }
+    return null;
+  };
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-blue-700">Investment Calculator</CardTitle>
+        <CardTitle className="text-2xl font-bold text-blue-700">
+          Investment Calculator
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -198,7 +221,12 @@ export function InvestmentCalculatorComponent() {
             </div>
           </CollapsibleContent>
         </Collapsible>
-        <Button onClick={calculateNeededAmount} className="w-full bg-blue-600 hover:bg-blue-700 text-white">Calculate Needed Amount</Button>
+        <Button
+          onClick={calculateNeededAmount}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          Calculate Needed Amount
+        </Button>
         {result && (
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
             <p className="text-blue-800">{result}</p>
@@ -207,7 +235,9 @@ export function InvestmentCalculatorComponent() {
         <div className="mt-8 min-h-[400px]">
           {savingsChartData.length > 0 ? (
             <>
-              <h3 className="text-lg font-semibold mb-4 text-blue-700">Savings Period</h3>
+              <h3 className="text-lg font-semibold mb-4 text-blue-700">
+                Savings Period
+              </h3>
               <div className="mb-4">
                 <Label htmlFor="yearsSlider">Adjust Years: {sliderValue}</Label>
                 <Slider
@@ -226,21 +256,29 @@ export function InvestmentCalculatorComponent() {
                   <YAxis tickFormatter={formatMillions} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
-                  <Bar dataKey="contributions" fill="#3b82f6" name="Contributions" />
+                  <Bar
+                    dataKey="contributions"
+                    fill="#3b82f6"
+                    name="Contributions"
+                  />
                   <Bar dataKey="returns" fill="#93c5fd" name="Returns" />
                 </BarChart>
               </ResponsiveContainer>
             </>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">Calculate to see the Savings Period chart</p>
+              <p className="text-gray-500">
+                Calculate to see the Savings Period chart
+              </p>
             </div>
           )}
         </div>
         <div className="mt-8 min-h-[400px]">
           {netWorthChartData.length > 0 ? (
             <>
-              <h3 className="text-lg font-semibold mb-4 text-blue-700">Net Worth Projection (40 Years)</h3>
+              <h3 className="text-lg font-semibold mb-4 text-blue-700">
+                Net Worth Projection (40 Years)
+              </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={netWorthChartData}>
                   <XAxis dataKey="year" />
@@ -253,11 +291,13 @@ export function InvestmentCalculatorComponent() {
             </>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">Calculate to see the Net Worth Projection chart</p>
+              <p className="text-gray-500">
+                Calculate to see the Net Worth Projection chart
+              </p>
             </div>
           )}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
