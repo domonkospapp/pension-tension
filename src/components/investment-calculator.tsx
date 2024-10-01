@@ -91,8 +91,8 @@ export function InvestmentCalculatorComponent() {
       });
       console.log(totalSavings);
     }
-    setYearsNeeded(years); // Set yearsNeeded based on the calculated years
-    setActualYears(years); // Set actualYears for later use
+    setYearsNeeded(years);
+    setActualYears(years);
 
     // Living off investments phase
     for (let i = years; i < 40; i++) {
@@ -112,11 +112,6 @@ export function InvestmentCalculatorComponent() {
     setSavingsChartData(newSavingsChartData);
     setNetWorthChartData(newNetWorthChartData);
     setAmountNeeded(neededAmount);
-    // setResult(
-    //   `You need approximately <strong>${formatCurrency(
-    //     neededAmount
-    //   )}</strong> to start living off your investments. You need to save for approximately <strong>${years}</strong> year(s).`
-    // );
   };
 
   const handleYearsChange = (newYears: number) => {
@@ -128,7 +123,6 @@ export function InvestmentCalculatorComponent() {
     const incomeNum = parseFloat(income.replace(/,/g, ""));
     const expensesNum = parseFloat(expenses.replace(/,/g, ""));
     const savingsNum = parseFloat(savings.replace(/,/g, ""));
-    const livingOffRateNum = parseFloat(livingOffRate) / 100;
     const interestRateNum = parseFloat(interestRate) / 100;
     const taxRateNum = parseFloat(taxRate) / 100;
 
