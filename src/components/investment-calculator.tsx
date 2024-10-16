@@ -195,6 +195,11 @@ export function InvestmentCalculatorComponent() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <p className="text-gray-600">
+          This calculator helps you determine how much you need to save and how
+          long it will take to achieve financial independence, based on your
+          income, expenses, and other key financial factors.
+        </p>
         <div className="space-y-2">
           <Label htmlFor="income">Yearly Net Income (€)</Label>
           <Input
