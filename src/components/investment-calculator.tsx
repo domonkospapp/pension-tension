@@ -347,7 +347,7 @@ export function InvestmentCalculatorComponent() {
           {netWorthChartData.length > 0 && (
             <>
               <h3 className="text-lg font-semibold mb-4 text-blue-700">
-                Net Worth Projection (40 Years)
+                Net Worth Projection for 40 Years
               </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={netWorthChartData}>
