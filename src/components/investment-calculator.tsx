@@ -240,7 +240,7 @@ export function InvestmentCalculatorComponent() {
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2 mt-2 p-4 border border-blue-200 bg-blue-50 rounded-lg">
             <div className="space-y-2">
-              <Label htmlFor="livingOffRate">Max Living Off Rate (%)</Label>
+              <Label htmlFor="livingOffRate">Living Off Rate (%)</Label>
               <Input
                 id="livingOffRate"
                 type="number"
@@ -251,7 +251,7 @@ export function InvestmentCalculatorComponent() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="interestRate">Interest Return (%)</Label>
+              <Label htmlFor="interestRate">Returns On Investments (%)</Label>
               <Input
                 id="interestRate"
                 type="number"
@@ -298,7 +298,13 @@ export function InvestmentCalculatorComponent() {
                 Savings Period
               </h3>
               <div className="mb-4">
-                <Label htmlFor="yearsSlider">Adjust Years: {actualYears}</Label>
+                <Label htmlFor="yearsSlider">
+                  Adjust Savings Period: {actualYears} Years
+                </Label>
+                <p className="text-gray-600 text-sm">
+                  You can consider starting to live off your investments later
+                  to decrease risks and maximize your net worth.
+                </p>
                 <Slider
                   id="yearsSlider"
                   min={1}
@@ -321,9 +327,13 @@ export function InvestmentCalculatorComponent() {
                   <Bar
                     dataKey="contributions"
                     fill="#3b82f6"
-                    name="Contributions"
+                    name="Income Contributions"
                   />
-                  <Bar dataKey="returns" fill="#93c5fd" name="Returns" />
+                  <Bar
+                    dataKey="returns"
+                    fill="#93c5fd"
+                    name="Investment Returns"
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </>
