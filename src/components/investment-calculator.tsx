@@ -187,6 +187,10 @@ export function InvestmentCalculatorComponent() {
     return null;
   };
 
+  const formatThousands = (value: number) => {
+    return `${(value / 1000).toFixed(1)}K`; // Change from millions to thousands
+  };
+
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
@@ -318,7 +322,7 @@ export function InvestmentCalculatorComponent() {
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={savingsChartData}>
                   <XAxis dataKey="year" />
-                  <YAxis tickFormatter={formatMillions} />
+                  <YAxis tickFormatter={formatThousands} />
                   <Tooltip
                     cursor={{ fill: "rgba(191, 219, 254, 0.3)" }}
                     content={<CustomTooltip />}
