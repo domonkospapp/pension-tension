@@ -280,7 +280,7 @@ export function InvestmentCalculatorComponent() {
         </Collapsible>
         <Button
           onClick={calculateNeededAmount}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
         >
           Calculate Needed Years
         </Button>
