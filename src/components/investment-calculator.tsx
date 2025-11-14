@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,22 +25,118 @@ import {
 } from "recharts";
 
 export function InvestmentCalculatorComponent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const initialCountry =
+    (searchParams.get("country") || "").toLowerCase() === "hu" ? "hu" : "at";
+  const [country, setCountry] = useState<"at" | "hu">(initialCountry);
+  const isHU = country === "hu";
+
+  const translations = {
+    en: {
+      title: "Pension Tension",
+      intro:
+        "This calculator helps you determine how much you need to save and how long it will take to achieve financial independence, based on your income, expenses, and other key financial factors.",
+      incomeLabel: "Yearly Net Income",
+      incomePlaceholder: "Enter your yearly net income",
+      expensesLabel: "Yearly Expenses",
+      expensesPlaceholder: "Enter your yearly expenses",
+      savingsLabel: "Current Savings",
+      savingsPlaceholder: "Enter your current savings",
+      advanced: "Advanced Options",
+      livingOffRate: "Living Off Rate (%)",
+      interestRate: "Returns On Investments (%)",
+      taxRate: "Investment Tax Rate (%)",
+      calculate: "Calculate Needed Years",
+      resultPrefix: "You need approximately ",
+      resultMiddle:
+        " to start living off your investments. You need to save for approximately ",
+      resultSuffix: " year(s).",
+      savingsPeriod: "Savings Period",
+      adjustSavings: "Adjust Savings Period",
+      adjustYearsSuffix: " Years",
+      savingsHint:
+        "You can consider starting to live off your investments later to decrease risks and maximize your net worth.",
+      incomeContributions: "Income Contributions",
+      investmentReturns: "Investment Returns",
+      netWorthProjection: "Net Worth Projection for 40 Years",
+      netWorth: "Net Worth",
+      yearLabel: "Year",
+      currencySymbol: "€",
+      numberLocale: "en-US" as const,
+      currencyCode: "EUR" as const,
+    },
+    hu: {
+      title: "Pension Tension",
+      intro:
+        "Ez a kalkulátor segít meghatározni, mennyit kell félretenned és mennyi időre van szükség a pénzügyi függetlenség eléréséhez a jövedelmed, kiadásaid és más fontos tényezők alapján.",
+      incomeLabel: "Éves nettó jövedelem",
+      incomePlaceholder: "Add meg az éves nettó jövedelmed",
+      expensesLabel: "Éves kiadások",
+      expensesPlaceholder: "Add meg az éves kiadásaid",
+      savingsLabel: "Jelenlegi megtakarítás",
+      savingsPlaceholder: "Add meg a jelenlegi megtakarításod",
+      advanced: "Speciális beállítások",
+      livingOffRate: "Kivételi ráta (%)",
+      interestRate: "Befektetések hozama (%)",
+      taxRate: "Befektetési adókulcs (%) (TBSZ)",
+      calculate: "Szükséges évek számítása",
+      resultPrefix: "Körülbelül ",
+      resultMiddle:
+        " megtakarításra van szükséged, hogy megkezdhesd a befektetésekből való megélést. Körülbelül ",
+      resultSuffix: " évig kell takarékoskodnod.",
+      savingsPeriod: "Megtakarítási időszak",
+      adjustSavings: "Megtakarítási időszak beállítása",
+      adjustYearsSuffix: " év",
+      savingsHint:
+        "Megfontolhatod, hogy később kezdd el a befektetésekből való megélést a kockázatok csökkentése és a vagyon maximalizálása érdekében.",
+      incomeContributions: "Jövedelemből származó befizetések",
+      investmentReturns: "Befektetési hozam",
+      netWorthProjection: "Vagyon alakulása 40 évre",
+      netWorth: "Vagyon",
+      yearLabel: "Év",
+      currencySymbol: "Ft",
+      numberLocale: "hu-HU" as const,
+      currencyCode: "HUF" as const,
+    },
+  };
+  const t = isHU ? translations.hu : translations.en;
+
+  const currencyCode = t.currencyCode;
+  const numberLocale = t.numberLocale;
+  const currencySymbolForLabel = t.currencySymbol;
+
   const [income, setIncome] = useState("0");
   const [expenses, setExpenses] = useState("0");
   const [savings, setSavings] = useState("0");
   const [livingOffRate, setLivingOffRate] = useState("4");
   const [interestRate, setInterestRate] = useState("8");
-  const [taxRate, setTaxRate] = useState("28");
+  const [taxRate, setTaxRate] = useState(isHU ? "0" : "28");
   const [savingsChartData, setSavingsChartData] = useState<any[]>([]);
   const [netWorthChartData, setNetWorthChartData] = useState<any[]>([]);
   const [yearsNeeded, setYearsNeeded] = useState(0);
   const [amountNeeded, setAmountNeeded] = useState(0);
   const [actualYears, setActualYears] = useState(0);
 
+  // Keep URL query param in sync with selected country
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (country === "hu") {
+      params.set("country", "hu");
+    } else {
+      params.delete("country");
+    }
+    const qs = params.toString();
+    const href = qs ? `${pathname}?${qs}` : pathname;
+    router.replace(href);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [country]);
+
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat(numberLocale, {
       style: "currency",
-      currency: "EUR",
+      currency: currencyCode,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
@@ -175,7 +272,9 @@ export function InvestmentCalculatorComponent() {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-4 border border-gray-200 rounded shadow-md">
-          <p className="font-bold">Year: {label}</p>
+          <p className="font-bold">
+            {t.yearLabel}: {label}
+          </p>
           {payload.map((entry: any, index: number) => (
             <p key={index} style={{ color: entry.color }}>
               {entry.name}: {formatCurrency(entry.value)}
@@ -191,60 +290,87 @@ export function InvestmentCalculatorComponent() {
     return `${(value / 1000).toFixed(1)}K`; // Change from millions to thousands
   };
 
+  useEffect(() => {
+    if (isHU) {
+      setTaxRate("0");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHU]);
+
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-blue-700">
-          Pension Tension
+          {t.title}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-gray-600">
-          This calculator helps you determine how much you need to save and how
-          long it will take to achieve financial independence, based on your
-          income, expenses, and other key financial factors.
-        </p>
+        <div className="flex justify-end gap-2">
+          <Button
+            variant={isHU ? "outline" : "default"}
+            size="sm"
+            onClick={() => setCountry("at")}
+            aria-pressed={!isHU}
+          >
+            <span className="fi fi-at mr-2" aria-hidden="true" /> Austria (EUR)
+          </Button>
+          <Button
+            variant={isHU ? "default" : "outline"}
+            size="sm"
+            onClick={() => setCountry("hu")}
+            aria-pressed={isHU}
+          >
+            <span className="fi fi-hu mr-2" aria-hidden="true" /> Hungary (HUF)
+          </Button>
+        </div>
+        <p className="text-gray-600">{t.intro}</p>
         <div className="space-y-2">
-          <Label htmlFor="income">Yearly Net Income (€)</Label>
+          <Label htmlFor="income">
+            {t.incomeLabel} ({currencySymbolForLabel})
+          </Label>
           <Input
             id="income"
             type="text"
             value={formatInputValue(income)}
             onChange={(e) => setIncome(e.target.value)}
-            placeholder="Enter your yearly net income"
+            placeholder={t.incomePlaceholder}
             className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="expenses">Yearly Expenses (€)</Label>
+          <Label htmlFor="expenses">
+            {t.expensesLabel} ({currencySymbolForLabel})
+          </Label>
           <Input
             id="expenses"
             type="text"
             value={formatInputValue(expenses)}
             onChange={(e) => setExpenses(e.target.value)}
-            placeholder="Enter your yearly expenses"
+            placeholder={t.expensesPlaceholder}
             className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="savings">Current Savings (€)</Label>
+          <Label htmlFor="savings">
+            {t.savingsLabel} ({currencySymbolForLabel})
+          </Label>
           <Input
             id="savings"
             type="text"
             value={formatInputValue(savings)}
             onChange={(e) => setSavings(e.target.value)}
-            placeholder="Enter your current savings"
+            placeholder={t.savingsPlaceholder}
             className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
           />
         </div>
         <Collapsible>
           <CollapsibleTrigger className="flex items-center justify-between w-full p-2 text-sm font-medium text-left text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100">
-            Advanced Options
+            {t.advanced}
             <ChevronDownIcon className="w-4 h-4" />
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2 mt-2 p-4 border border-blue-200 bg-blue-50 rounded-lg">
             <div className="space-y-2">
-              <Label htmlFor="livingOffRate">Living Off Rate (%)</Label>
+              <Label htmlFor="livingOffRate">{t.livingOffRate}</Label>
               <Input
                 id="livingOffRate"
                 type="number"
@@ -255,7 +381,7 @@ export function InvestmentCalculatorComponent() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="interestRate">Returns On Investments (%)</Label>
+              <Label htmlFor="interestRate">{t.interestRate}</Label>
               <Input
                 id="interestRate"
                 type="number"
@@ -266,7 +392,7 @@ export function InvestmentCalculatorComponent() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="taxRate">Investment Tax Rate (%)</Label>
+              <Label htmlFor="taxRate">{t.taxRate}</Label>
               <Input
                 id="taxRate"
                 type="number"
@@ -282,16 +408,16 @@ export function InvestmentCalculatorComponent() {
           onClick={calculateNeededAmount}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
         >
-          Calculate Needed Years
+          {t.calculate}
         </Button>
         {!!yearsNeeded && (
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
             <p className="text-blue-800">
-              {`You need approximately `}
+              {t.resultPrefix}
               <strong>{formatCurrency(amountNeeded)}</strong>
-              {` to start living off your investments. You need to save for approximately `}
+              {t.resultMiddle}
               <strong>{yearsNeeded}</strong>
-              {` year(s).`}
+              {t.resultSuffix}
             </p>
           </div>
         )}
@@ -299,16 +425,14 @@ export function InvestmentCalculatorComponent() {
           {savingsChartData.length > 0 && (
             <>
               <h3 className="text-lg font-semibold mb-4 text-blue-700">
-                Savings Period
+                {t.savingsPeriod}
               </h3>
               <div className="mb-4">
                 <Label htmlFor="yearsSlider">
-                  Adjust Savings Period: {actualYears} Years
+                  {t.adjustSavings}: {actualYears}
+                  {t.adjustYearsSuffix}
                 </Label>
-                <p className="text-gray-600 text-sm">
-                  You can consider starting to live off your investments later
-                  to decrease risks and maximize your net worth.
-                </p>
+                <p className="text-gray-600 text-sm">{t.savingsHint}</p>
                 <Slider
                   id="yearsSlider"
                   min={1}
@@ -331,12 +455,12 @@ export function InvestmentCalculatorComponent() {
                   <Bar
                     dataKey="contributions"
                     fill="#3b82f6"
-                    name="Income Contributions"
+                    name={t.incomeContributions}
                   />
                   <Bar
                     dataKey="returns"
                     fill="#93c5fd"
-                    name="Investment Returns"
+                    name={t.investmentReturns}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -347,7 +471,7 @@ export function InvestmentCalculatorComponent() {
           {netWorthChartData.length > 0 && (
             <>
               <h3 className="text-lg font-semibold mb-4 text-blue-700">
-                Net Worth Projection for 40 Years
+                {t.netWorthProjection}
               </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={netWorthChartData}>
@@ -358,7 +482,7 @@ export function InvestmentCalculatorComponent() {
                     content={<CustomTooltip />}
                   />
                   <Legend />
-                  <Bar dataKey="netWorth" fill="#2563eb" name="Net Worth" />
+                  <Bar dataKey="netWorth" fill="#2563eb" name={t.netWorth} />
                 </BarChart>
               </ResponsiveContainer>
             </>
