@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen p-8 flex flex-col items-center justify-center">
+    <div className="min-h-screen py-12 px-4 flex flex-col items-center justify-start">
       <Suspense fallback={<div className="text-gray-500">Loading…</div>}>
         <InvestmentCalculatorComponent />
       </Suspense>

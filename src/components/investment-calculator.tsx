@@ -3,17 +3,15 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Slider } from "@/components/ui/slider";
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon, TrendingUpIcon, WalletIcon, PiggyBankIcon, SettingsIcon, ZapIcon } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -36,19 +34,20 @@ export function InvestmentCalculatorComponent() {
   const translations = {
     en: {
       title: "Pension Tension",
+      subtitle: "Financial Independence Calculator",
       intro:
-        "This calculator helps you determine how much you need to save and how long it will take to achieve financial independence, based on your income, expenses, and other key financial factors.",
+        "Determine how much you need to save and how long it will take to achieve financial independence, based on your income, expenses, and key financial factors.",
       incomeLabel: "Yearly Net Income",
-      incomePlaceholder: "Enter your yearly net income",
+      incomePlaceholder: "e.g. 60,000",
       expensesLabel: "Yearly Expenses",
-      expensesPlaceholder: "Enter your yearly expenses",
+      expensesPlaceholder: "e.g. 36,000",
       savingsLabel: "Current Savings",
-      savingsPlaceholder: "Enter your current savings",
+      savingsPlaceholder: "e.g. 20,000",
       advanced: "Advanced Options",
       livingOffRate: "Living Off Rate (%)",
       interestRate: "Returns On Investments (%)",
       taxRate: "Investment Tax Rate (%)",
-      calculate: "Calculate Needed Years",
+      calculate: "Calculate My Path to FIRE",
       resultPrefix: "You need approximately ",
       resultMiddle:
         " to start living off your investments. You need to save for approximately ",
@@ -57,7 +56,7 @@ export function InvestmentCalculatorComponent() {
       adjustSavings: "Adjust Savings Period",
       adjustYearsSuffix: " Years",
       savingsHint:
-        "You can consider starting to live off your investments later to decrease risks and maximize your net worth.",
+        "Consider starting to live off your investments later to reduce risk and maximize your net worth.",
       incomeContributions: "Income Contributions",
       investmentReturns: "Investment Returns",
       netWorthProjection: "Net Worth Projection for 40 Years",
@@ -69,14 +68,15 @@ export function InvestmentCalculatorComponent() {
     },
     hu: {
       title: "Pension Tension",
+      subtitle: "Pénzügyi Függetlenség Kalkulátor",
       intro:
         "Ez a kalkulátor segít meghatározni, mennyit kell félretenned és mennyi időre van szükség a pénzügyi függetlenség eléréséhez a jövedelmed, kiadásaid és más fontos tényezők alapján.",
       incomeLabel: "Éves nettó jövedelem",
-      incomePlaceholder: "Add meg az éves nettó jövedelmed",
+      incomePlaceholder: "pl. 6,000,000",
       expensesLabel: "Éves kiadások",
-      expensesPlaceholder: "Add meg az éves kiadásaid",
+      expensesPlaceholder: "pl. 3,600,000",
       savingsLabel: "Jelenlegi megtakarítás",
-      savingsPlaceholder: "Add meg a jelenlegi megtakarításod",
+      savingsPlaceholder: "pl. 2,000,000",
       advanced: "Speciális beállítások",
       livingOffRate: "Kivételi ráta (%)",
       interestRate: "Befektetések hozama (%)",
@@ -214,7 +214,7 @@ export function InvestmentCalculatorComponent() {
 
   const handleYearsChange = (newYears: number) => {
     setActualYears(newYears);
-    calculateChartData(newYears); // Recalculate chart data based on new yearsNeeded
+    calculateChartData(newYears);
   };
 
   const calculateChartData = (years: number) => {
@@ -271,12 +271,12 @@ export function InvestmentCalculatorComponent() {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 border border-gray-200 rounded shadow-md">
-          <p className="font-bold">
-            {t.yearLabel}: {label}
+        <div className="glass-strong rounded-xl p-3 shadow-2xl">
+          <p className="font-semibold text-slate-200 text-sm mb-2">
+            {t.yearLabel} {label}
           </p>
           {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ color: entry.color }}>
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
               {entry.name}: {formatCurrency(entry.value)}
             </p>
           ))}
@@ -287,7 +287,7 @@ export function InvestmentCalculatorComponent() {
   };
 
   const formatThousands = (value: number) => {
-    return `${(value / 1000).toFixed(1)}K`; // Change from millions to thousands
+    return `${(value / 1000).toFixed(1)}K`;
   };
 
   useEffect(() => {
@@ -298,197 +298,284 @@ export function InvestmentCalculatorComponent() {
   }, [isHU]);
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-blue-700">
+    <div className="w-full max-w-4xl mx-auto px-4">
+      {/* Header */}
+      <div className="text-center mb-10">
+        <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 mb-6 text-xs font-medium text-violet-300">
+          <ZapIcon className="w-3 h-3" />
+          <span>FIRE Calculator</span>
+        </div>
+        <h1 className="text-6xl font-bold gradient-text mb-4 tracking-tight">
           {t.title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex justify-end gap-2">
-          <Button
-            variant={isHU ? "outline" : "default"}
-            size="sm"
+        </h1>
+        <p className="text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
+          {t.intro}
+        </p>
+      </div>
+
+      {/* Country switcher */}
+      <div className="flex justify-center mb-8">
+        <div className="glass rounded-2xl p-1.5 flex gap-1">
+          <button
             onClick={() => setCountry("at")}
             aria-pressed={!isHU}
+            className={`pill-tab flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-medium transition-all ${!isHU ? "active" : "text-slate-400"}`}
           >
-            <span className="fi fi-at mr-2" aria-hidden="true" /> Austria (EUR)
-          </Button>
-          <Button
-            variant={isHU ? "default" : "outline"}
-            size="sm"
+            <span className="fi fi-at" aria-hidden="true" />
+            Austria <span className="text-xs opacity-60">EUR</span>
+          </button>
+          <button
             onClick={() => setCountry("hu")}
             aria-pressed={isHU}
+            className={`pill-tab flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-medium transition-all ${isHU ? "active" : "text-slate-400"}`}
           >
-            <span className="fi fi-hu mr-2" aria-hidden="true" /> Hungary (HUF)
-          </Button>
+            <span className="fi fi-hu" aria-hidden="true" />
+            Hungary <span className="text-xs opacity-60">HUF</span>
+          </button>
         </div>
-        <p className="text-gray-600">{t.intro}</p>
-        <div className="space-y-2">
-          <Label htmlFor="income">
-            {t.incomeLabel} ({currencySymbolForLabel})
-          </Label>
-          <Input
-            id="income"
-            type="text"
-            value={formatInputValue(income)}
-            onChange={(e) => setIncome(e.target.value)}
-            placeholder={t.incomePlaceholder}
-            className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-          />
+      </div>
+
+      {/* Main card */}
+      <div className="glass-strong rounded-3xl p-8 glow-card mb-6">
+        {/* Input grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+          <div className="space-y-2">
+            <Label htmlFor="income" className="text-slate-300 text-xs font-medium uppercase tracking-wider flex items-center gap-1.5">
+              <WalletIcon className="w-3.5 h-3.5 text-violet-400" />
+              {t.incomeLabel} ({currencySymbolForLabel})
+            </Label>
+            <Input
+              id="income"
+              type="text"
+              value={formatInputValue(income)}
+              onChange={(e) => setIncome(e.target.value)}
+              placeholder={t.incomePlaceholder}
+              className="glass-input rounded-xl text-white placeholder:text-slate-600 border-0 h-12 text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="expenses" className="text-slate-300 text-xs font-medium uppercase tracking-wider flex items-center gap-1.5">
+              <TrendingUpIcon className="w-3.5 h-3.5 text-pink-400" />
+              {t.expensesLabel} ({currencySymbolForLabel})
+            </Label>
+            <Input
+              id="expenses"
+              type="text"
+              value={formatInputValue(expenses)}
+              onChange={(e) => setExpenses(e.target.value)}
+              placeholder={t.expensesPlaceholder}
+              className="glass-input rounded-xl text-white placeholder:text-slate-600 border-0 h-12 text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="savings" className="text-slate-300 text-xs font-medium uppercase tracking-wider flex items-center gap-1.5">
+              <PiggyBankIcon className="w-3.5 h-3.5 text-indigo-400" />
+              {t.savingsLabel} ({currencySymbolForLabel})
+            </Label>
+            <Input
+              id="savings"
+              type="text"
+              value={formatInputValue(savings)}
+              onChange={(e) => setSavings(e.target.value)}
+              placeholder={t.savingsPlaceholder}
+              className="glass-input rounded-xl text-white placeholder:text-slate-600 border-0 h-12 text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="expenses">
-            {t.expensesLabel} ({currencySymbolForLabel})
-          </Label>
-          <Input
-            id="expenses"
-            type="text"
-            value={formatInputValue(expenses)}
-            onChange={(e) => setExpenses(e.target.value)}
-            placeholder={t.expensesPlaceholder}
-            className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="savings">
-            {t.savingsLabel} ({currencySymbolForLabel})
-          </Label>
-          <Input
-            id="savings"
-            type="text"
-            value={formatInputValue(savings)}
-            onChange={(e) => setSavings(e.target.value)}
-            placeholder={t.savingsPlaceholder}
-            className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-          />
-        </div>
+
+        {/* Advanced options */}
         <Collapsible>
-          <CollapsibleTrigger className="flex items-center justify-between w-full p-2 text-sm font-medium text-left text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100">
+          <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 text-sm font-medium text-slate-400 hover:text-slate-200 glass rounded-xl mb-2 transition-all hover:border-violet-500/20 group">
+            <SettingsIcon className="w-3.5 h-3.5 text-violet-400" />
             {t.advanced}
-            <ChevronDownIcon className="w-4 h-4" />
+            <ChevronDownIcon className="w-4 h-4 ml-auto transition-transform group-data-[state=open]:rotate-180" />
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-2 mt-2 p-4 border border-blue-200 bg-blue-50 rounded-lg">
-            <div className="space-y-2">
-              <Label htmlFor="livingOffRate">{t.livingOffRate}</Label>
-              <Input
-                id="livingOffRate"
-                type="number"
-                value={livingOffRate}
-                onChange={(e) => setLivingOffRate(e.target.value)}
-                step="0.1"
-                className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="interestRate">{t.interestRate}</Label>
-              <Input
-                id="interestRate"
-                type="number"
-                value={interestRate}
-                onChange={(e) => setInterestRate(e.target.value)}
-                step="0.1"
-                className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="taxRate">{t.taxRate}</Label>
-              <Input
-                id="taxRate"
-                type="number"
-                value={taxRate}
-                onChange={(e) => setTaxRate(e.target.value)}
-                step="0.1"
-                className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-              />
+          <CollapsibleContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 glass rounded-xl mb-4">
+              <div className="space-y-2">
+                <Label htmlFor="livingOffRate" className="text-slate-400 text-xs font-medium uppercase tracking-wider">
+                  {t.livingOffRate}
+                </Label>
+                <Input
+                  id="livingOffRate"
+                  type="number"
+                  value={livingOffRate}
+                  onChange={(e) => setLivingOffRate(e.target.value)}
+                  step="0.1"
+                  className="glass-input rounded-xl text-white border-0 h-10 focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="interestRate" className="text-slate-400 text-xs font-medium uppercase tracking-wider">
+                  {t.interestRate}
+                </Label>
+                <Input
+                  id="interestRate"
+                  type="number"
+                  value={interestRate}
+                  onChange={(e) => setInterestRate(e.target.value)}
+                  step="0.1"
+                  className="glass-input rounded-xl text-white border-0 h-10 focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="taxRate" className="text-slate-400 text-xs font-medium uppercase tracking-wider">
+                  {t.taxRate}
+                </Label>
+                <Input
+                  id="taxRate"
+                  type="number"
+                  value={taxRate}
+                  onChange={(e) => setTaxRate(e.target.value)}
+                  step="0.1"
+                  className="glass-input rounded-xl text-white border-0 h-10 focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+              </div>
             </div>
           </CollapsibleContent>
         </Collapsible>
-        <Button
+
+        {/* Calculate button */}
+        <button
           onClick={calculateNeededAmount}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
+          className="gradient-btn w-full py-4 rounded-xl text-white font-semibold text-base tracking-wide"
         >
           {t.calculate}
-        </Button>
+        </button>
+
+        {/* Result */}
         {!!yearsNeeded && (
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-blue-800">
-              {t.resultPrefix}
-              <strong>{formatCurrency(amountNeeded)}</strong>
-              {t.resultMiddle}
-              <strong>{yearsNeeded}</strong>
-              {t.resultSuffix}
-            </p>
+          <div className="mt-5 result-glow rounded-2xl p-5">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <ZapIcon className="w-5 h-5 text-violet-300" />
+              </div>
+              <p className="text-slate-200 text-base leading-relaxed">
+                {t.resultPrefix}
+                <span className="font-bold text-violet-300">{formatCurrency(amountNeeded)}</span>
+                {t.resultMiddle}
+                <span className="font-bold text-pink-300">{yearsNeeded}</span>
+                {t.resultSuffix}
+              </p>
+            </div>
           </div>
         )}
-        <div className="mt-8">
-          {savingsChartData.length > 0 && (
-            <>
-              <h3 className="text-lg font-semibold mb-4 text-blue-700">
+      </div>
+
+      {/* Charts section */}
+      {savingsChartData.length > 0 && (
+        <div className="space-y-6">
+          <div className="section-divider my-4" />
+
+          {/* Savings period chart */}
+          <div className="glass-strong rounded-3xl p-8 glow-card">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-white">
                 {t.savingsPeriod}
               </h3>
-              <div className="mb-4">
-                <Label htmlFor="yearsSlider">
-                  {t.adjustSavings}: {actualYears}
-                  {t.adjustYearsSuffix}
-                </Label>
-                <p className="text-gray-600 text-sm">{t.savingsHint}</p>
-                <Slider
-                  id="yearsSlider"
-                  min={1}
-                  max={40}
-                  step={1}
-                  value={[actualYears]} // Ensure this is an array
-                  onValueChange={(value) => handleYearsChange(value[0])} // Update state correctly
-                  className="text-blue-600 mt-2"
+              <span className="text-sm text-violet-300 font-medium glass px-3 py-1 rounded-full">
+                {actualYears}{t.adjustYearsSuffix}
+              </span>
+            </div>
+            <div className="mb-6">
+              <p className="text-slate-400 text-sm mb-3">{t.savingsHint}</p>
+              <Slider
+                id="yearsSlider"
+                min={1}
+                max={40}
+                step={1}
+                value={[actualYears]}
+                onValueChange={(value) => handleYearsChange(value[0])}
+                className="[&_[role=slider]]:bg-violet-500 [&_[role=slider]]:border-violet-400 [&_[role=slider]]:shadow-lg [&_.relative]:bg-slate-700"
+              />
+            </div>
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={savingsChartData} barGap={0}>
+                <XAxis
+                  dataKey="year"
+                  tick={{ fill: "#64748b", fontSize: 11 }}
+                  axisLine={{ stroke: "#1e293b" }}
+                  tickLine={false}
                 />
-              </div>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={savingsChartData}>
-                  <XAxis dataKey="year" />
-                  <YAxis tickFormatter={formatThousands} />
-                  <Tooltip
-                    cursor={{ fill: "rgba(191, 219, 254, 0.3)" }}
-                    content={<CustomTooltip />}
-                  />
-                  <Legend />
-                  <Bar
-                    dataKey="contributions"
-                    fill="#3b82f6"
-                    name={t.incomeContributions}
-                  />
-                  <Bar
-                    dataKey="returns"
-                    fill="#93c5fd"
-                    name={t.investmentReturns}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </>
-          )}
-        </div>
-        <div className="mt-8">
+                <YAxis
+                  tickFormatter={formatThousands}
+                  tick={{ fill: "#64748b", fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  cursor={{ fill: "rgba(139, 92, 246, 0.08)" }}
+                  content={<CustomTooltip />}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: "12px", color: "#94a3b8", paddingTop: "12px" }}
+                />
+                <Bar
+                  dataKey="contributions"
+                  fill="#7c3aed"
+                  name={t.incomeContributions}
+                  radius={[2, 2, 0, 0]}
+                />
+                <Bar
+                  dataKey="returns"
+                  fill="#ec4899"
+                  name={t.investmentReturns}
+                  radius={[2, 2, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Net worth projection chart */}
           {netWorthChartData.length > 0 && (
-            <>
-              <h3 className="text-lg font-semibold mb-4 text-blue-700">
+            <div className="glass-strong rounded-3xl p-8 glow-card">
+              <h3 className="text-lg font-semibold text-white mb-6">
                 {t.netWorthProjection}
               </h3>
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={netWorthChartData}>
-                  <XAxis dataKey="year" />
-                  <YAxis tickFormatter={formatMillions} />
+                  <XAxis
+                    dataKey="year"
+                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    axisLine={{ stroke: "#1e293b" }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tickFormatter={formatMillions}
+                    tick={{ fill: "#64748b", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
                   <Tooltip
-                    cursor={{ fill: "rgba(191, 219, 254, 0.3)" }}
+                    cursor={{ fill: "rgba(139, 92, 246, 0.08)" }}
                     content={<CustomTooltip />}
                   />
-                  <Legend />
-                  <Bar dataKey="netWorth" fill="#2563eb" name={t.netWorth} />
+                  <Legend
+                    wrapperStyle={{ fontSize: "12px", color: "#94a3b8", paddingTop: "12px" }}
+                  />
+                  <Bar
+                    dataKey="netWorth"
+                    fill="url(#netWorthGradient)"
+                    name={t.netWorth}
+                    radius={[3, 3, 0, 0]}
+                  />
+                  <defs>
+                    <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#8b5cf6" />
+                      <stop offset="100%" stopColor="#6d28d9" />
+                    </linearGradient>
+                  </defs>
                 </BarChart>
               </ResponsiveContainer>
-            </>
+            </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+      )}
+
+      {/* Footer */}
+      <p className="text-center text-slate-600 text-xs mt-8 mb-4">
+        Pension Tension — FIRE Calculator
+      </p>
+    </div>
   );
 }
